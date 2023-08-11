@@ -4,23 +4,18 @@
 
 // Std
 # include <stdlib.h>
-# include <unistd.h>
 # include <stdio.h>
-# include <string.h>
-
-// Time, types, math
 # include <sys/time.h>
-# include <stdint.h>
-# include <math.h>
 
 // Networking
 # include <netdb.h>
 # include <arpa/inet.h>
 
-// Errors & signals
-# include <signal.h>
-# include <errno.h>
 
+// Program values
+# define BUFLEN 256
+# define HOSTLEN 65
+# define DATALEN 24
 
 // Flag struct
 struct s_flags {
@@ -31,19 +26,17 @@ struct s_flags {
     int     pausemsecs;     // -z | Wait time between probes (milliseconds)
     int     padlen;         // Padding length (depends on max_ttl)
     int     finished;       // Indicates the program should terminate
-    char    host[65];       // A copy of the host argv
+    char    host[HOSTLEN];  // A copy of the host argv
 };
 
-// Packet structure
-// struct ppacket {
-//     uint8_t     type;           // 8 for request, 0 for reply
-//     uint8_t     code;           // Always 0
-//     uint16_t    checksum;       // Computed total for checks
-//     uint16_t    identifier;     // Unique ID of current ping "loop" (always 0 here)
-//     uint16_t    sequence_number;// Unique ID of ping in loop (starts at 1, increments)
-//     char        time[8];        // Timestamp as data optimization
-//     char        data[48];       // Data (static)
-// };
+// Flags defaults
+# define DEFAULT_FIRST_TTL 1
+# define DEFAULT_MAX_TTL 64
+# define DEFAULT_NQUERIES 3
+# define DEFAULT_WAITTIME 5
+# define DEFAULT_PAUSEMSECS 0
+# define DEFAULT_PADLEN 0
+# define DEFAULT_FINISHED 0
 
 // Trace packet struct for send()
 struct trace_packet {
@@ -51,7 +44,7 @@ struct trace_packet {
     uint16_t    dstport;        // Destination port
     uint16_t    len;            // Packet length
     uint16_t    checksum;       // Computed total for checks (unused if 0)
-    char        data[24];       // Data (static)
+    char        data[DATALEN];  // Data (static)
 };
 
 // Trace packet defaults
@@ -92,7 +85,7 @@ void print_long_host (const char *host);
 void print_ttl_issue (int first_ttl, int max_ttl);
 void print_newttl (int ttl);
 void print_newline (void);
-void print_address (struct in_addr addr);
+void print_address (const char *host, struct in_addr addr);
 void print_star (void);
 void print_timestamp (struct timeval old, struct timeval new);
 

@@ -71,9 +71,9 @@ void print_newline (void)
 }
 
 // Print host and ip address
-void print_address (struct in_addr addr)
+void print_address (const char *host, struct in_addr addr)
 {
-    printf("%s (%s)  ", inet_ntoa(addr), inet_ntoa(addr));
+    printf("%s (%s)  ", host, inet_ntoa(addr));
 }
 
 // Print wildcard when no reply

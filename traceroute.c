@@ -6,13 +6,13 @@
 
 // Init flags with defaults
 struct s_flags g_flags = {
-    .first_ttl = 1,
-    .max_ttl = 64,
-    .nqueries = 3,
-    .waittime = 5,
-    .pausemsecs = 0,
-    .padlen = 0,
-    .finished = 0,
+    .first_ttl = DEFAULT_FIRST_TTL,
+    .max_ttl = DEFAULT_MAX_TTL,
+    .nqueries = DEFAULT_NQUERIES,
+    .waittime = DEFAULT_WAITTIME,
+    .pausemsecs = DEFAULT_PAUSEMSECS,
+    .padlen = DEFAULT_PADLEN,
+    .finished = DEFAULT_FINISHED,
 };
 
 // Init prev
@@ -79,7 +79,7 @@ void recv_reply (int sockfd)
 {
     struct sockaddr_in  from;
     socklen_t           addrlen;
-    char                buf[1000];
+    char                buf[BUFLEN];
 
     while (1) {
         memzero(&buf, sizeof(buf));
@@ -107,12 +107,16 @@ void recv_reply (int sockfd)
         }
     }
 
+    // Resolve hostname
+    char hostname[BUFLEN] = {0};
+    getnameinfo((struct sockaddr *)&from, addrlen, hostname, sizeof(hostname), 0, 0, 0);
+
     // Print new addresses and timestamps
     int addr_diff = memcomp(&(from.sin_addr), &(prev.ip), sizeof(struct in_addr));
     if (addr_diff) {
         if (prev.sameline)
             print_newline();
-        print_address(from.sin_addr);
+        print_address(hostname, from.sin_addr);
     }
     print_timestamp(prev.sent, getnow());
 
@@ -172,6 +176,7 @@ void ft_traceroute (int sock_udp, int sock_icmp)
             exit(0);
         }
     }
+    printf("\n");
 }
 
 int main (int ac, char **av)
